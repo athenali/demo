@@ -20,7 +20,7 @@ public class NewController {
     private  static  final Logger logger=LoggerFactory.getLogger(NewController.class);
     @RequestMapping(value = "/test")
     public String test(){
-
+        //测试提交2
         //测试提交
         return "hello word";
     }
