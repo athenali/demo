@@ -22,6 +22,6 @@ public class NewController {
     public String test(){
         //测试提交2
         //测试提交
-        return "hello 1111111";
+        return "hello 22222";
     }
 }
