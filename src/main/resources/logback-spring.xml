@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="10 seconds" >
+    <!--1.定义日志文件的存储地址-->
+<!-- 	<springProperty scope="context" name="logPath" source="logging.path"/> -->
+	<property name="logPath" value="${user.dir}/log" />
+    <springProperty scope="context" name="rollMonitorPath" source="logging.roll.monitor.path"/>
+    <springProperty scope="context" name="rollQrServerPath" source="logging.roll.qrserver.path"/>
+    <springProperty scope="context" name="monitorIp" source="log.monitor.ip"/>
+    <springProperty scope="context" name="monitorPort" source="server.port"/>
+    <!-- 日志文件大小,超过这个大小将被压缩 -->
+    <property name="log.max.size" value="50MB" />
+    <!-- 日志最大的历史 180天 -->
+    <property name="max.history" value="180" />
+    <property name="version" value="V1.0"></property>
+
+    <!-- 2.控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} ===> %msg%n</pattern>
+            <!-- 日志输出编码 -->
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 3.qrServer业务日志文件，按照每天生成日志文件 -->
+    <appender name="qrServer"  class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/qrServer.log</file>
+        <append>false</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${rollQrServerPath}/%d{yyyyMMdd}/${monitorPort}_qrServer.%d{yyyyMMdd}-%i.log</FileNamePattern>
+            <!--文件保存多久/天-->
+            <MaxFileSize>${log.max.size}</MaxFileSize>
+            <MaxHistory>${max.history}</MaxHistory>
+            <TotalSizeCap>10GB</TotalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] ${version} %-5level %logger{36} ===> %msg%n</pattern>
+            <!-- 日志输出编码 -->
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+      <appender name="ASYNC_qrServer" class="ch.qos.logback.classic.AsyncAppender">  
+	    <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->  
+	    <discardingThreshold>0</discardingThreshold>  
+	    <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->  
+	    <queueSize>1024</queueSize>  
+	    <!-- 添加附加的appender,最多只能添加一个 -->  
+	    <appender-ref ref="qrServer"/>  
+	  </appender>  
+
+
+    <!-- 4.1.online加密监控日志文件，按照每天生成日志文件 -->
+    <appender name="ENCONLINE"  class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/check.log</file>
+        <append>false</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${rollMonitorPath}/%d{yyyyMMdd}/${monitorIp}_${monitorPort}_check.%d{yyyyMMdd}-%i.log</FileNamePattern>
+            <!--文件保存多久/天-->
+            <MaxFileSize>${log.max.size}</MaxFileSize>
+            <MaxHistory>${max.history}</MaxHistory>
+           <!-- <TotalSizeCap>10GB</TotalSizeCap>-->
+        </rollingPolicy>
+        <encoder>
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} - %msg%n</pattern>
+            <!-- 日志输出编码 -->
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+	<!-- 4.2.interface监控日志文件，按照每天生成日志文件 -->
+    <appender name="INTERFACE"  class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/interface.log</file>
+        <append>false</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${rollMonitorPath}/%d{yyyyMMdd}/${monitorIp}_${monitorPort}_interface.%d{yyyyMMdd}-%i.log</FileNamePattern>
+            <!--文件保存多久/天-->
+            <MaxFileSize>${log.max.size}</MaxFileSize>
+            <MaxHistory>${max.history}</MaxHistory>
+           <!-- <TotalSizeCap>1GB</TotalSizeCap>-->
+        </rollingPolicy>
+        <encoder>
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} - %msg%n</pattern>
+            <!-- 日志输出编码 -->
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+	<appender name="ASYNC_interface" class="ch.qos.logback.classic.AsyncAppender">  
+	    <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->  
+	    <discardingThreshold>0</discardingThreshold>  
+	    <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->  
+	    <queueSize>1024</queueSize>  
+	    <!-- 添加附加的appender,最多只能添加一个 -->  
+	    <appender-ref ref="INTERFACE"/>  
+	  </appender> 
+    <!-- 4.指明不同java包的日志输出级别，将会覆盖root的输出级别 -->
+    <logger name="com.rails" level="INFO"/>
+
+    <!--oauth相关提示-->
+    <!--<logger name="org.springframework.security.authentication.dao.DaoAuthenticationProvider" level="DEBUG"/>-->
+    <!--<logger name="org.springframework.web.servlet.HandlerExceptionResolver" level="DEBUG"/>-->
+    <!--<logger name="org.springframework.security.oauth2.provider.endpoint.TokenEndpoint" level="INFO"/>-->
+    <!--<logger name="org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint" level="INFO"/>-->
+    <!--<logger name="org.springframework.security.oauth2.provider.token" level="INFO"/>-->
+    <!--<logger name="org.springframework.security.oauth2.provider.error" level="DEBUG"/>-->
+
+    <logger name="interface" level="INFO" additivity="false">
+        <appender-ref ref="ASYNC_interface"/>
+    </logger>
+    <logger name="encOnline" level="INFO" additivity="false">
+        <appender-ref ref="ENCONLINE"/>
+    </logger>
+
+    <!-- 5.日志输出级别 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="ASYNC_qrServer" />
+    </root>
+
+
+</configuration>
